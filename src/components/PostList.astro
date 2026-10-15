@@ -1,0 +1,27 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate, postSlug } from '../lib/blog';
+import { localizePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  posts: CollectionEntry<'blog'>[];
+}
+
+const { lang, posts } = Astro.props;
+---
+
+<ul class='flex flex-col gap-4'>
+  {
+    posts.map((post) => (
+      <li>
+        <a href={localizePath(lang, `/blog/${postSlug(post)}/`)} class='underline'>
+          {post.data.title}
+        </a>
+        <time datetime={post.data.pubDate.toISOString()} class='block text-sm'>
+          {formatDate(post.data.pubDate, lang)}
+        </time>
+      </li>
+    ))
+  }
+</ul>

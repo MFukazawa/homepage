@@ -1,0 +1,59 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { formatDate, getPosts, postSlug } from '../../../lib/blog';
+import { langPaths, langs, localizePath, useTranslations } from '../../../i18n/ui';
+
+export const getStaticPaths = (async () => {
+  const slugsByLang = new Map(
+    await Promise.all(
+      langs.map(async (l) => [l, new Set((await getPosts(l)).map(postSlug))] as const),
+    ),
+  );
+
+  const paths = await Promise.all(
+    langPaths().map(async ({ params, props: { lang } }) =>
+      (await getPosts(lang)).map((post) => {
+        const slug = postSlug(post);
+        // Link each language's version of this post, or that language's blog index if untranslated.
+        const translations = Object.fromEntries(
+          langs.map((l) => [
+            l,
+            localizePath(l, slugsByLang.get(l)?.has(slug) ? `/blog/${slug}/` : '/blog/'),
+          ]),
+        );
+        return { params: { ...params, slug }, props: { lang, post, translations } };
+      }),
+    ),
+  );
+  return paths.flat();
+}) satisfies GetStaticPaths;
+
+const { lang, post, translations } = Astro.props;
+const t = useTranslations(lang);
+const { title, description, pubDate, updatedDate } = post.data;
+const { Content } = await render(post);
+---
+
+<Base title={title} description={description} translations={translations}>
+  <article class='flex flex-col gap-4'>
+    <header>
+      <h1 class='text-3xl font-bold'>{title}</h1>
+      <p class='text-sm'>
+        <time datetime={pubDate.toISOString()}>{formatDate(pubDate, lang)}</time>
+        {
+          updatedDate && (
+            <>
+              · {t('blog.updated')}{' '}
+              <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate, lang)}</time>
+            </>
+          )
+        }
+      </p>
+    </header>
+    <div class='post'>
+      <Content />
+    </div>
+  </article>
+</Base>

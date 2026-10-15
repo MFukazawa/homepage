@@ -1,17 +1,20 @@
 ---
-import SocialLinks from './SocialLinks.astro';
-const today = new Date();
+import { AUTHOR, SOCIAL_LINKS } from '../data/site';
+
+const year = new Date().getFullYear();
 ---
 
-<footer>
-  <p>&copy; {today.getFullYear()} Micah Fukazawa. All rights reserved.</p>
-  <SocialLinks isHeader={false} />
+<footer class='flex flex-col-reverse gap-2 text-sm sm:flex-row sm:items-center sm:justify-between'>
+  <p>&copy; {year} {AUTHOR}</p>
+  <ul class='flex flex-wrap gap-x-4'>
+    {
+      SOCIAL_LINKS.map(({ label, href }) => (
+        <li>
+          <a href={href} target='_blank' rel='noopener noreferrer' class='inline-block py-2 underline'>
+            {label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
 </footer>
-<style>
-  footer {
-    padding: 2em 1em 6em 1em;
-    background: linear-gradient(var(--gray-gradient)) no-repeat;
-    color: rgb(var(--gray));
-    text-align: center;
-  }
-</style>

@@ -1,0 +1,36 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts } from '../../lib/blog';
+import { langPaths, localizePath, useTranslations } from '../../i18n/ui';
+
+export const getStaticPaths = (() => langPaths()) satisfies GetStaticPaths;
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const latestPosts = (await getPosts(lang)).slice(0, 3);
+---
+
+<Base>
+  <section class='flex flex-col gap-4'>
+    <h1 class='text-3xl font-bold'>
+      {lang === 'ja' ? '深澤マイカ進吉' : 'Micah Fukazawa'}
+    </h1>
+    <p>
+      {
+        t('home.intro')
+          .split('\n')
+          .map((line, i) => (i === 0 ? line.trim() : [<br />, line.trim()]))
+      }
+    </p>
+  </section>
+
+  <section class='mt-12 flex flex-col gap-4'>
+    <h2 class='text-xl font-bold'>{t('home.latestPosts')}</h2>
+    <PostList lang={lang} posts={latestPosts} />
+    <a href={localizePath(lang, '/blog/')} class='underline'
+      >{t('home.allPosts')}</a
+    >
+  </section>
+</Base>

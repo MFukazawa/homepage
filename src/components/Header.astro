@@ -1,53 +1,33 @@
 ---
-import SocialLinks from './SocialLinks.astro';
-import HeaderLink from './HeaderLink.astro';
-import { SITE_TITLE } from '../consts';
+import { NAV_LINKS, SITE_TITLE } from '../data/site';
+import { languages, localizePath, useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  translations: Partial<Record<Lang, string>>;
+}
+
+const { lang, translations } = Astro.props;
+const t = useTranslations(lang);
+const otherLangs = (Object.keys(translations) as Lang[]).filter((l) => l !== lang);
 ---
 
-<header>
-  <nav>
-    <h2><a href='/'>{SITE_TITLE}</a></h2>
-    <div class='internal-links'>
-      <HeaderLink href='/'>Home</HeaderLink>
-      <HeaderLink href='/blog'>Blog</HeaderLink>
-      <HeaderLink href='/about'>About</HeaderLink>
-    </div>
-    <SocialLinks isHeader />
+<header class='flex flex-wrap items-center justify-between gap-x-4'>
+  <a href={localizePath(lang, '/')} class='py-2 font-bold'>{SITE_TITLE}</a>
+  <nav class='flex gap-4'>
+    {
+      NAV_LINKS.map(({ key, path }) => (
+        <a href={localizePath(lang, path)} class='py-2 underline'>
+          {t(key)}
+        </a>
+      ))
+    }
+    {
+      otherLangs.map((l) => (
+        <a href={translations[l]} hreflang={l} lang={l} class='py-2 underline'>
+          {languages[l]}
+        </a>
+      ))
+    }
   </nav>
 </header>
-<style>
-  header {
-    margin: 0;
-    padding: 0 1em;
-    background: white;
-    box-shadow: 0 2px 8px rgba(var(--black), 5%);
-  }
-  h2 {
-    margin: 0;
-    font-size: 1em;
-  }
-
-  h2 a,
-  h2 a.active {
-    text-decoration: none;
-  }
-  nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  nav a {
-    padding: 0.75em 0.5em;
-    color: var(--black);
-    border-bottom: 4px solid transparent;
-    text-decoration: none;
-  }
-  nav a.active {
-    text-decoration: none;
-    border-bottom-color: var(--accent);
-  }
-  .social-links,
-  .social-links a {
-    display: flex;
-  }
-</style>

@@ -1,68 +1,59 @@
-# Astro Starter Kit: Blog
+# fuka.dev
 
-```sh
-npm create astro@latest -- --template blog
+Micah Fukazawa's homepage, built with [Astro](https://astro.build) and deployed to Netlify.
+
+## Commands
+
+| Command        | Action                                   |
+| :------------- | :--------------------------------------- |
+| `pnpm install` | Install dependencies                     |
+| `pnpm dev`     | Start the dev server at `localhost:4321` |
+| `pnpm build`   | Build the static site to `./dist/`       |
+| `pnpm preview` | Preview the build locally                |
+| `pnpm check`   | Type-check `.astro` and `.ts` files      |
+
+## Project structure
+
+```
+src/
+  components/        Header, Footer, PostList
+  content/blog/en/   English Markdown posts
+  content/blog/ja/   Japanese Markdown posts (same filename = translation)
+  content.config.ts  Blog collection schema
+  data/site.ts       Site title, nav links, social links
+  i18n/ui.ts         Locales, UI strings, path helpers
+  layouts/Base.astro
+  lib/blog.ts        getPosts() and formatDate()
+  pages/[...lang]/   index, about, blog/, rss.xml for every locale
+  pages/404.astro
+  styles/global.css  Tailwind entry point and @theme tokens
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/blog)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/blog)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/blog/devcontainer.json)
+To add a post, create a `.md` file in `src/content/blog/<lang>/` with `title`, `description` and `pubDate` frontmatter.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## i18n
 
-![blog](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
+English is served at `/` and Japanese at `/ja/` (Astro i18n routing, `prefixDefaultLocale: false`). Each page under `pages/[...lang]/` is generated once per locale. UI strings live in `src/i18n/ui.ts`. A post's translation is the file with the same name in the other language's folder; if it doesn't exist, the language switcher links to that language's blog index.
 
-Features:
+## Migration from Gridsome
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
+This replaces the old [MFukazawa/hp](https://github.com/MFukazawa/hp) site.
 
-## 🚀 Project Structure
+|                 | Before                          | After                             |
+| :-------------- | :------------------------------ | :-------------------------------- |
+| Framework       | Gridsome 0.7 (Vue 2)            | Astro 7                           |
+| Styling         | Tailwind v1 (PostCSS plugin)    | Tailwind v4 (`@tailwindcss/vite`) |
+| Content         | Contentful via GraphQL (unused) | Markdown content collection       |
+| Package manager | npm                             | pnpm                              |
+| Node            | unpinned                        | 22                                |
 
-Inside of your Astro project, you'll see the following folders and files:
+### Architecture decisions
 
-```text
-├── public/
-├── src/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
-```
+- **Static output, no adapter.** Netlify serves `dist/`.
+- **No UI framework and no client-side JavaScript.** Pages are plain `.astro` components.
+- **No CMS.** Posts are Markdown files in the repo, so the site needs no environment variables.
+- **Blank-slate styling.** `global.css` only imports Tailwind; the design will be built up from here.
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Deployment
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-
-## Credit
-
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+Netlify reads `netlify.toml`: `pnpm build`, publish `dist`, Node 22.

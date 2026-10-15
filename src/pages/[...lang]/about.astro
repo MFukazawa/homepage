@@ -1,0 +1,41 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import { langPaths, useTranslations } from '../../i18n/ui';
+
+export const getStaticPaths = (() => langPaths()) satisfies GetStaticPaths;
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<Base title={t('about.title')}>
+  <article class='flex flex-col gap-4'>
+    <h1 class='text-3xl font-bold'>{t('about.title')}</h1>
+    {
+      lang === 'ja' ? (
+        <>
+          <p>
+            深澤マイカ進吉です。元フロントエンドエンジニア、現在は株式会社Sodaでエンジニアリングマネージャーをしています。
+          </p>
+          <p>英語と日本語のバイリンガル。</p>
+          <p>
+            最近は、AI以降の世界におけるエンジニア、そしてエンジニアリングの役割を読み解くことに夢中です。
+          </p>
+        </>
+      ) : (
+        <>
+          <p>
+            I'm Micah Fukazawa. Former frontend engineer, current Engineering
+            Manager at Soda, Inc.
+          </p>
+          <p>Bilingual in English/Japanese.</p>
+          <p>
+            Currently passionate about deciphering the role of engineers and
+            engineering in a post-AI world.
+          </p>
+        </>
+      )
+    }
+  </article>
+</Base>

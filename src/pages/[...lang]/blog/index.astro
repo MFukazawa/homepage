@@ -1,0 +1,18 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../../layouts/Base.astro';
+import PostList from '../../../components/PostList.astro';
+import { getPosts } from '../../../lib/blog';
+import { langPaths, useTranslations } from '../../../i18n/ui';
+
+export const getStaticPaths = (() => langPaths()) satisfies GetStaticPaths;
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const posts = await getPosts(lang);
+---
+
+<Base title={t('blog.title')}>
+  <h1 class='mb-8 text-3xl font-bold'>{t('blog.title')}</h1>
+  <PostList lang={lang} posts={posts} />
+</Base>
